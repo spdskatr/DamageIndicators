@@ -27,7 +27,7 @@ namespace DamageMotes
             {
                 val = dinfo.Amount;
             }
-            if (val > 0.01f && __instance.Map != null && __instance.ShouldDisplayDamage()) ThrowDamageMote(val, __instance.Map, __instance.DrawPos, val.ToString());
+            if (val > 0.01f && __instance.Map != null && __instance.ShouldDisplayDamage(dinfo.Instigator)) ThrowDamageMote(val, __instance.Map, __instance.DrawPos, val.ToString());
         }
         public static void ThrowDamageMote(float damage, Map map, Vector3 loc, string text)
         {
@@ -96,9 +96,9 @@ namespace DamageMotes
         /// <summary>
         /// Used on both the instigator and the target.
         /// </summary>
-        internal static bool ShouldDisplayDamage(this Thing t)
+        internal static bool ShouldDisplayDamage(this Thing t, Thing instigator = null)
         {
-            return LoadedModManager.GetMod<DMMod>().settings.EnableIndicatorNeutralFaction || t?.Faction != null;
+            return (LoadedModManager.GetMod<DMMod>().settings.EnableIndicatorNeutralFaction || t?.Faction != null) || (instigator?.ShouldDisplayDamage() ?? false);
         }
         public static bool TranspilerUtility_NotifyMiss(bool b, Thing t)
         {
