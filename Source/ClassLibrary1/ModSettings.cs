@@ -8,11 +8,13 @@ namespace DamageMotes
     public class DMModSettings : ModSettings
     {
         public bool EnableIndicatorNeutralFaction;
+        public bool DisplayPawnsOnly;
 
         public override void ExposeData()
         {
             base.ExposeData();
             Scribe_Values.Look(ref EnableIndicatorNeutralFaction, "EnableIndicatorNeutralFaction");
+            Scribe_Values.Look(ref DisplayPawnsOnly, "DisplayPawnsOnly");
         }
 
         public void DoWindowContents(Rect inRect)
@@ -23,7 +25,17 @@ namespace DamageMotes
             };
             list.Begin(inRect);
             list.CheckboxLabeled("EnableIndicatorNeutralFactions".Translate(), ref EnableIndicatorNeutralFaction, "EnableIndicatorNeutralFactions_Desc".Translate());
+            list.CheckboxLabeled("DisplayPawnsOnly".Translate(), ref DisplayPawnsOnly, "DisplayPawnsOnly_Desc".Translate());
             list.End();
+        }
+
+        public bool ShouldDisplayDamageAccordingToSettings(Thing t)
+        {
+            if (!EnableIndicatorNeutralFaction && t.Faction == null)
+                return false;
+            if (DisplayPawnsOnly && !(t is Pawn))
+                return false;
+            return true;
         }
 
         public void WriteSettings(DMMod instance) => LoadedModManager.WriteModSettings(instance.Content.Identifier, instance.GetType().Name, this);

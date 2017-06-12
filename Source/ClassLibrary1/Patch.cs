@@ -6,6 +6,7 @@ using Harmony;
 using System.Collections.Generic;
 using System.Reflection.Emit;
 using System.Linq;
+using System.Reflection;
 
 namespace DamageMotes
 {
@@ -14,20 +15,34 @@ namespace DamageMotes
     {
         static DamageMotes_Patch()
         {
-            HarmonyInstance.Create("com.spdskatr.DamageMotes.Patch").PatchAll(System.Reflection.Assembly.GetExecutingAssembly());
+            HarmonyInstance.Create("com.spdskatr.DamageMotes.Patch").PatchAll(Assembly.GetExecutingAssembly());
             Log.Message("SS Damage Motes initialized.\n " + 
-                "Patched pre + postfix non-destructive: " + typeof(DamageWorker).FullName + "." + nameof(DamageWorker.Apply) + 
-                "\n Patched Postfix non-destructive: " + typeof(ShieldBelt) + "." + nameof(ShieldBelt.CheckPreAbsorbDamage));
+                "Patched infix non-destructive: " + typeof(Thing).FullName + "." + nameof(Thing.TakeDamage) + 
+                "\n Patched Postfix non-destructive: " + typeof(ShieldBelt) + "." + nameof(ShieldBelt.CheckPreAbsorbDamage) +
+                "\n Patched infix non-destructive: " + typeof(Verb_MeleeAttack) + ".TryCastShot");
         }
-        [HarmonyPriority(600)]
-        static void Prefix(Thing __instance, DamageInfo dinfo)
+        public static void TakeDamageInfix(Thing instance, float num, DamageInfo dinfo)
         {
-            var val = Mathf.Min(dinfo.Amount, __instance.HitPoints);
-            if (__instance is Pawn)
+            if (num > 0.01f && instance.Map != null && instance.ShouldDisplayDamage(dinfo.Instigator)) ThrowDamageMote(num, instance.Map, instance.DrawPos, num.ToString());
+        }
+        public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+        {
+            var instructionsList = new List<CodeInstruction>(instructions);
+            for (int i = 0; i < instructionsList.Count; i++)
             {
-                val = dinfo.Amount;
+                var curInstruction = instructionsList[i];
+                yield return curInstruction;
+                if (curInstruction.opcode == OpCodes.Stloc_S && 
+                    instructionsList[i - 1].operand == AccessTools.Method(typeof(DamageWorker), "Apply"))
+                {
+                    //Load 3 arguments: One the instance, one a local variable of the damage, one the damage info as provided in the arguments of original method
+                    yield return new CodeInstruction(OpCodes.Ldarg_0);
+                    yield return new CodeInstruction(OpCodes.Ldloc_S, (byte)5);
+                    yield return new CodeInstruction(OpCodes.Ldarg_1);
+                    //Call
+                    yield return new CodeInstruction(OpCodes.Call, typeof(DamageMotes_Patch).GetMethod("TakeDamageInfix"));
+                }
             }
-            if (val > 0.01f && __instance.Map != null && __instance.ShouldDisplayDamage(dinfo.Instigator)) ThrowDamageMote(val, __instance.Map, __instance.DrawPos, val.ToString());
         }
         public static void ThrowDamageMote(float damage, Map map, Vector3 loc, string text)
         {
@@ -81,9 +96,13 @@ namespace DamageMotes
                 var instr = instrList[i];
                 if (instr.opcode == OpCodes.Bge_Un && instrList[i-1].operand == typeof(Verb_MeleeAttack).GetMethod("GetNonMissChance", AccessTools.all))
                 {
+                    //Compares if first value less than second and pushes true/false onto stack
                     yield return new CodeInstruction(OpCodes.Clt_Un);
+                    //Load second declared local variable (Thing)
                     yield return new CodeInstruction(OpCodes.Ldloc_2);
+                    //Use above two values on stack to call method DamageMotesUtil.TranspilerUtility_NotifyMiss
                     yield return new CodeInstruction(OpCodes.Call, typeof(DamageMotesUtil).GetMethod(nameof(DamageMotesUtil.TranspilerUtility_NotifyMiss), AccessTools.all));
+                    //Use returned value (basically value of Clt_Un opcode) and break (activate original code)
                     yield return new CodeInstruction(OpCodes.Brfalse, instr.operand);
                     continue;
                 }
@@ -98,7 +117,7 @@ namespace DamageMotes
         /// </summary>
         internal static bool ShouldDisplayDamage(this Thing t, Thing instigator = null)
         {
-            return (LoadedModManager.GetMod<DMMod>().settings.EnableIndicatorNeutralFaction || t?.Faction != null) || (instigator?.ShouldDisplayDamage() ?? false);
+            return (LoadedModManager.GetMod<DMMod>().settings.ShouldDisplayDamageAccordingToSettings(t)) || (instigator != null && instigator.ShouldDisplayDamage());
         }
         public static bool TranspilerUtility_NotifyMiss(bool b, Thing t)
         {
