@@ -15,3 +15,4 @@ C:\Program Files (x86)\Steam\steamapps\common\RimWorld\Mods\[SS] DamageMotes\Ass
 C:\Program Files (x86)\Steam\steamapps\common\RimWorld\Mods\[SS] DamageIndicators\Assemblies\DamageMotes.dll
 C:\Program Files (x86)\Steam\steamapps\common\RimWorld\Mods\[SS] DamageIndicators\Source\ClassLibrary1\obj\Debug\DamageMotes.csprojResolveAssemblyReference.cache
 C:\Program Files (x86)\Steam\steamapps\common\RimWorld\Mods\[SS] DamageIndicators\Source\ClassLibrary1\obj\Debug\DamageMotes.dll
+C:\Program Files (x86)\Steam\steamapps\common\RimWorld\Mods\[SS] DamageIndicators\Source\ClassLibrary1\obj\Debug\DamageMotes.csproj.CoreCompileInputs.cache
