@@ -16,13 +16,14 @@ namespace DamageMotes
         static DamageMotes_Patch()
         {
             HarmonyInstance.Create("com.spdskatr.DamageMotes.Patch").PatchAll(Assembly.GetExecutingAssembly());
-            Log.Message("SS Damage Motes initialized.\n " + 
+            Log.Message("SS Damage Indicators initialized.\n " + 
                 "Patched infix non-destructive: " + typeof(Thing).FullName + "." + nameof(Thing.TakeDamage) + 
                 "\n Patched Postfix non-destructive: " + typeof(ShieldBelt) + "." + nameof(ShieldBelt.CheckPreAbsorbDamage) +
                 "\n Patched infix non-destructive: " + typeof(Verb_MeleeAttack) + ".TryCastShot");
         }
-        public static void TakeDamageInfix(Thing instance, float num, DamageInfo dinfo)
+        public static void TakeDamageInfix(Thing instance, DamageWorker.DamageResult result, DamageInfo dinfo)
         {
+            float num = result.totalDamageDealt;
             if (num > 0.01f && instance.Map != null && instance.ShouldDisplayDamage(dinfo.Instigator)) ThrowDamageMote(num, instance.Map, instance.DrawPos, num.ToString());
         }
         public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
@@ -37,7 +38,7 @@ namespace DamageMotes
                 {
                     //Load 3 arguments: One the instance, one a local variable of the damage, one the damage info as provided in the arguments of original method
                     yield return new CodeInstruction(OpCodes.Ldarg_0);
-                    yield return new CodeInstruction(OpCodes.Ldloc_S, (byte)5);
+                    yield return new CodeInstruction(OpCodes.Ldloc_S, (byte)6);
                     yield return new CodeInstruction(OpCodes.Ldarg_1);
                     //Call
                     yield return new CodeInstruction(OpCodes.Call, typeof(DamageMotes_Patch).GetMethod("TakeDamageInfix"));
