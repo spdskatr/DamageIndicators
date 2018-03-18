@@ -29,9 +29,9 @@ namespace DamageMotes
             list.End();
         }
 
-        public bool ShouldDisplayDamageAccordingToSettings(Thing t)
+        public bool ShouldDisplayDamageAccordingToSettings(Thing t, Thing instigator = null)
         {
-            if (!EnableIndicatorNeutralFaction && t.Faction == null)
+            if (!EnableIndicatorNeutralFaction && t.Faction == null && instigator?.Faction == null)
                 return false;
             if (DisplayPawnsOnly && !(t is Pawn))
                 return false;
