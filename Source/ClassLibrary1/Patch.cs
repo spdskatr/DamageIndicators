@@ -116,9 +116,9 @@ namespace DamageMotes
         /// <summary>
         /// Used on both the instigator and the target.
         /// </summary>
-        internal static bool ShouldDisplayDamage(this Thing t, Thing instigator = null)
+        internal static bool ShouldDisplayDamage(this Thing target, Thing instigator)
         {
-            return LoadedModManager.GetMod<DMMod>().settings.ShouldDisplayDamageAccordingToSettings(t, instigator);
+            return (LoadedModManager.GetMod<DMMod>().settings.ShouldDisplayDamageAccordingToSettings(target, instigator));
         }
         public static bool TranspilerUtility_NotifyMiss(bool b, Thing t)
         {
