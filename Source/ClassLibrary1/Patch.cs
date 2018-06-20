@@ -37,8 +37,8 @@ namespace DamageMotes
                     instructionsList[i - 1].operand == AccessTools.Method(typeof(DamageWorker), "Apply"))
                 {
                     //Load 3 arguments: One the instance, one a local variable of the damage, one the damage info as provided in the arguments of original method
-                    yield return new CodeInstruction(OpCodes.Ldarg_0);// DamageWorker
-                    yield return new CodeInstruction(OpCodes.Ldloc_S, (byte)5); // DamageResult
+                    yield return new CodeInstruction(OpCodes.Ldarg_0);// Thing
+                    yield return new CodeInstruction(OpCodes.Ldloc_S, (byte)6); // DamageResult
                     yield return new CodeInstruction(OpCodes.Ldarg_1); // DamageInfo
                     //Call
                     yield return new CodeInstruction(OpCodes.Call, typeof(DamageMotes_Patch).GetMethod("TakeDamageInfix"));
@@ -116,9 +116,9 @@ namespace DamageMotes
         /// <summary>
         /// Used on both the instigator and the target.
         /// </summary>
-        internal static bool ShouldDisplayDamage(this Thing target, Thing instigator)
+        public static bool ShouldDisplayDamage(this Thing target, Thing instigator)
         {
-            return (LoadedModManager.GetMod<DMMod>().settings.ShouldDisplayDamageAccordingToSettings(target, instigator));
+            return LoadedModManager.GetMod<DMMod>().settings.ShouldDisplayDamageAccordingToSettings(target, instigator);
         }
         public static bool TranspilerUtility_NotifyMiss(bool b, Thing t)
         {

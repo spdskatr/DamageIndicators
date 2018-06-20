@@ -31,7 +31,7 @@ namespace DamageMotes
 
         public bool ShouldDisplayDamageAccordingToSettings(Thing target, Thing instigator)
         {
-            if (!EnableIndicatorNeutralFaction && (target.Faction == null || (instigator!= null && instigator.Faction == null)))
+            if (!EnableIndicatorNeutralFaction && (target.Faction == null || (instigator != null && instigator.Faction == null)))
                 return false;
             if (DisplayPawnsOnly && !(target is Pawn))
                 return false;

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ModMetaData>
-	<name>SS Damage Indicators</name>
+	<name>Damage Indicators</name>
 	<author>Spdskatr</author>
-	<targetVersion>0.18.1700</targetVersion>
+	<targetVersion>1.0.0</targetVersion>
 	<description>A simple QoL mod that shows the damage taken.</description>
 </ModMetaData>
