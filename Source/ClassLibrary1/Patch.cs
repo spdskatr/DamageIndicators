@@ -38,7 +38,7 @@ namespace DamageMotes
                 {
                     //Load 3 arguments: One the instance, one a local variable of the damage, one the damage info as provided in the arguments of original method
                     yield return new CodeInstruction(OpCodes.Ldarg_0);// Thing
-                    yield return new CodeInstruction(OpCodes.Ldloc_S, (byte)6); // DamageResult
+                    yield return new CodeInstruction(OpCodes.Ldloc_S, (byte)5); // DamageResult
                     yield return new CodeInstruction(OpCodes.Ldarg_1); // DamageInfo
                     //Call
                     yield return new CodeInstruction(OpCodes.Call, typeof(DamageMotes_Patch).GetMethod("TakeDamageInfix"));
