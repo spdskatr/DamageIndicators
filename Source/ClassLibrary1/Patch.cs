@@ -24,7 +24,7 @@ namespace DamageMotes
         public static void TakeDamageInfix(Thing instance, DamageWorker.DamageResult result, DamageInfo dinfo)
         {
             float num = result.totalDamageDealt;
-            if (num > 0.01f && instance.Map != null && instance.ShouldDisplayDamage(dinfo.Instigator)) ThrowDamageMote(num, instance.Map, instance.DrawPos, num.ToString());
+            if (num > 0.01f && instance.Map != null && instance.ShouldDisplayDamage(dinfo.Instigator)) ThrowDamageMote(num, instance.Map, instance.DrawPos, Math.Ceiling(num).ToString());
         }
         public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
         {
